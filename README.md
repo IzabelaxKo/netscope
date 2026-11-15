@@ -1,6 +1,6 @@
 # NetScope – Network Diagnostics Platform
 
-**Autor:** [Twoje imię i nazwisko]
+**Autor:** Iza
 
 ## 1. Cel aplikacji
 
