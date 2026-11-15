@@ -1,0 +1,28 @@
+:root {
+  --navy: #070f2b;
+  --indigo: #1b1a55;
+  --slate: #535c91;
+  --lavender: #9290c3;
+  --text-primary: #f3f2ff;
+  --text-muted: #c4c4e0;
+  --line: rgba(146, 144, 195, 0.3);
+
+  font-family: 'Aptos', 'Segoe UI', sans-serif;
+  color: var(--text-primary);
+  background: var(--navy);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
