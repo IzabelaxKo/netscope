@@ -12,13 +12,14 @@ class User(db.Model):
     created_at = Column(db.DateTime, default=db.func.current_timestamp())
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.email}>'
 
     def to_json(self):
         return {
             'id': self.id,
-            'username': self.username
-        } 
+            'email': self.email,
+            'role': self.role
+        }
 
 class Asset(db.Model):
     __tablename__ = 'assets'

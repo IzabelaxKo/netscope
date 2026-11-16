@@ -1,6 +1,10 @@
 from config import app, db
 from flask import jsonify, request
-from models import Asset, AuthorizationRequest, ScanRun, User
+from flask_bcrypt import Bcrypt
+from models import User
+
+
+bcrypt = Bcrypt(app)
 
 @app.route('/')
 def index():
@@ -9,12 +13,14 @@ def index():
 @app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
-    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
 
-    if not username:
-        return jsonify({'error': 'Username is required'}), 400
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required'}), 400
+    hashed_pwd = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    user = User(username=username)
+    user = User(email=email, passw_hash=hashed_pwd, role='user')
     db.session.add(user)
     db.session.commit()
 
@@ -37,4 +43,19 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({'message': 'User deleted'}), 200
 
+@app.route('/login_user', methods=['POST'])
+def login_user():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not bcrypt.check_password_hash(user.passw_hash, password):
+        return jsonify({'error': 'Invalid email or password'}), 401
+
+#   PIRATE TOKEN
+    return jsonify(user.to_json()), 200
 

@@ -2,8 +2,10 @@ import { useState } from 'react';
 import './components.css';
 import { ShieldCheck } from "lucide-react";
 
+
 export default function RegisterForm() {
-    const [username, setUsername] = useState('');
+    let API_URL = "127.0.0.1:5000"; // PLACEHOLDER FOR FUTURE
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -13,8 +15,28 @@ export default function RegisterForm() {
             alert("Passwords do not match!");
             return;
         }
-        // Handle registration logic here
-    }
+        
+        try {
+            const response = await fetch(`http://${API_URL}/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create user');
+            }
+
+            const userData = await response.json();
+            console.log('User created:', userData);
+            alert('User created successfully! You can now log in.');
+        } catch (error) {
+            console.error('Error creating user:', error);
+            alert('Failed to create user');
+        }
+    };
 
     return (
         <div className="register-form">
@@ -24,14 +46,14 @@ export default function RegisterForm() {
                 </div>
                 <h2>Create an account</h2>
                 <p className="register-subtitle">Sign up for NetScope</p>
-                <label htmlFor="username">Username</label>
+                <label htmlFor="email">Email</label>
                 <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                 />
                 <label htmlFor="password">Password</label>
                 <input

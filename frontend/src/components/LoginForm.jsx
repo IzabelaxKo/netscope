@@ -4,11 +4,35 @@ import { ShieldCheck } from "lucide-react";
 // import { useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
-    const [username, setUsername] = useState('');
+    let API_URL = "127.0.0.1:5000"; // PLACEHOLDER FOR FUTURE
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        try {
+            const response = await fetch(`http://${API_URL}/login_user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to log in');
+            }
+            const userData = await response.json();
+            console.log('User logged in:', userData);
+            alert('Login successful! Welcome back.');
+
+            // PIRATE TOKEN 
+
+        }catch (error) {
+            console.error('Error logging in:', error);
+            alert('Failed to log in');
+        }        
     }
     
     return (    
@@ -21,14 +45,14 @@ export default function LoginForm() {
             <h2>Welcome back</h2>
             <p className="login-subtitle">Sign in to NetScope</p>
 
-            <label htmlFor="username">Username</label>
+            <label htmlFor="email">Email</label>
             <input
-            id="username"
-            name="username"
-            type="text"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             />
 
