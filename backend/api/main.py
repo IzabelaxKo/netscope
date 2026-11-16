@@ -1,17 +1,6 @@
-from flask import Flask, jsonify
+from config import app, db
 
-
-app = Flask(__name__)
-
-@app.route("/")
-def index():
-	return jsonify(message="Welcome to the Netscope API!")
-
-
-@app.get("/api/health")
-def health():
-	return jsonify(status="ok", service="netscope-api")
-
-
-if __name__ == "__main__":
-	app.run(host="127.0.0.1", port=5000)
+if __name__ == '__main__':
+	with app.app_context():
+		db.create_all() 
+	app.run(debug=True)
