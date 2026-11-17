@@ -1,11 +1,11 @@
 import datetime
 from functools import wraps
+
+import jwt
 from config import app, db
 from flask import jsonify, request
 from flask_bcrypt import Bcrypt
-import jwt
 from models import User
-
 
 bcrypt = Bcrypt(app)
 
@@ -37,10 +37,6 @@ def token_required(f):
 
     return decorated
 
-
-@app.route('/')
-def index():
-    return jsonify({'message': 'Welcome to the API'}), 200
 
 @app.route('/users', methods=['POST'])
 def create_user():
@@ -93,7 +89,7 @@ def login_user():
             'user_id': user.id,
             'email': user.email,
             'role': user.role,
-            'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24),
+            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=24),
         },
         app.config['SECRET_KEY'],
         algorithm='HS256',

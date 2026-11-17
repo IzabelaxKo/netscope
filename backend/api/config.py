@@ -1,5 +1,6 @@
 import os
-from flask import Flask
+
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
@@ -10,3 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db = SQLAlchemy(app)
 
 app.json.sort_keys = False
+
+@app.route('/')
+def index():
+    return jsonify({'message': 'Welcome to the API'}), 200
