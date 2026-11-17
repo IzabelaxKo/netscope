@@ -1,10 +1,42 @@
+import datetime
+from functools import wraps
 from config import app, db
 from flask import jsonify, request
 from flask_bcrypt import Bcrypt
+import jwt
 from models import User
 
 
 bcrypt = Bcrypt(app)
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ', 1)[1].strip()
+        elif 'session_token' in request.cookies:
+            token = request.cookies.get('session_token')
+
+        if not token:
+            return jsonify({'error': 'Token is missing'}), 401
+
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            current_user = db.session.get(User, payload['user_id'])
+            if not current_user:
+                return jsonify({'error': 'User not found'}), 401
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token'}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
 
 @app.route('/')
 def index():
@@ -56,6 +88,26 @@ def login_user():
     if not user or not bcrypt.check_password_hash(user.passw_hash, password):
         return jsonify({'error': 'Invalid email or password'}), 401
 
-#   PIRATE TOKEN
-    return jsonify(user.to_json()), 200
+    token = jwt.encode(
+        {
+            'user_id': user.id,
+            'email': user.email,
+            'role': user.role,
+            'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24),
+        },
+        app.config['SECRET_KEY'],
+        algorithm='HS256',
+    )
+
+    return jsonify({
+        'message': 'Login successful',
+        'token': token,
+        'user': user.to_json()
+    }), 200
+
+@app.route('/auth/me', methods=['GET'])
+@token_required
+def get_current_user(current_user):
+    return jsonify({'user': current_user.to_json()}), 200
+
 

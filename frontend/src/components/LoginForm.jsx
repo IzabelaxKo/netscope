@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 import './components.css';
 import { ShieldCheck } from "lucide-react";
 // import { useNavigate } from 'react-router-dom';
 
-export default function LoginForm() {
+export default function LoginForm({ onLoginSuccess }) {
     let API_URL = "127.0.0.1:5000"; // PLACEHOLDER FOR FUTURE
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
@@ -25,11 +26,17 @@ export default function LoginForm() {
             }
             const userData = await response.json();
             console.log('User logged in:', userData);
+
+            if (userData.token) {
+                Cookies.set('session_token', userData.token, { expires: 1, sameSite: 'lax' });
+            }
+
             alert('Login successful! Welcome back.');
 
-            // PIRATE TOKEN 
-
-        }catch (error) {
+            if (onLoginSuccess) {
+                onLoginSuccess(userData.user);
+            }
+        } catch (error) {
             console.error('Error logging in:', error);
             alert('Failed to log in');
         }        
