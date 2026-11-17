@@ -74,22 +74,27 @@
   box-shadow: 0 0 0 3px rgba(57, 148, 230, 0.12);
 }
 
-.login-form input[aria-invalid="true"] {
+.login-form input[aria-invalid="true"],
+.register-form input[aria-invalid="true"] {
   border-color: var(--red);
 }
 
-.login-form input[aria-invalid="true"]:focus {
+.login-form input[aria-invalid="true"]:focus,
+.register-form input[aria-invalid="true"]:focus {
   box-shadow: 0 0 0 3px rgba(240, 82, 112, 0.12);
 }
 
 .login-error,
-.login-field-error {
+.login-field-error,
+.register-error,
+.register-field-error {
   color: var(--red);
   font-size: 0.8rem;
   line-height: 1.4;
 }
 
-.login-error {
+.login-error,
+.register-error {
   margin: 0;
   padding: 10px 12px;
   background: rgba(240, 82, 112, 0.1);
@@ -97,8 +102,20 @@
   border-radius: var(--radius-md);
 }
 
-.login-field-error {
+.login-field-error,
+.register-field-error {
   margin: -5px 0 0;
+}
+
+.register-success {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(0, 214, 160, 0.1);
+  border: 1px solid rgba(0, 214, 160, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--green);
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .login-form button {
@@ -230,6 +247,15 @@
 
 .register-form button:active {
   transform: translateY(1px);
+}
+
+.register-form button:disabled,
+.register-form button:disabled:hover {
+  background: var(--surface-secondary);
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: wait;
+  transform: none;
 }
 
 @media (max-width: 520px) {
