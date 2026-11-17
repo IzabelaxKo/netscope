@@ -439,21 +439,21 @@ export default function Dashboard({ isAdmin, currentUser }) {
 
   // Dynamic Stat Cards
   const adminStats = [
-    { label: 'Registered Accounts', value: users.length, note: `${users.filter((u) => u.role === 'admin').length} admin accounts`, icon: Users },
-    { label: 'Monitored Assets', value: assets.length, note: 'Network nodes and services', icon: Server },
-    { label: 'Pending Authorizations', value: authRequests.filter((r) => r.status === 'pending').length, note: 'Awaiting administrator review', icon: FileCheck },
-    { label: 'Total Scan Runs', value: scanRuns.length, note: `${scanRuns.filter((s) => s.status === 'completed').length} completed scans`, icon: Activity },
+    { label: 'Registered Accounts', value: users.length, note: `${users.filter((u) => u.role === 'admin').length} admin accounts`, icon: Users, tone: 'info' },
+    { label: 'Monitored Assets', value: assets.length, note: 'Network nodes and services', icon: Server, tone: 'info' },
+    { label: 'Pending Authorizations', value: authRequests.filter((r) => r.status === 'pending').length, note: 'Awaiting administrator review', icon: FileCheck, tone: 'warning' },
+    { label: 'Total Scan Runs', value: scanRuns.length, note: `${scanRuns.filter((s) => s.status === 'completed').length} completed scans`, icon: Activity, tone: 'info' },
   ]
 
   const userStats = [
-    { label: 'My Monitored Assets', value: assets.length, note: 'Targets added to your account', icon: Server },
-    { label: 'Verified Authorizations', value: authRequests.filter((r) => r.status === 'accepted').length, note: 'Private pages approved for scanning', icon: ShieldCheck },
-    { label: 'Pending Requests', value: authRequests.filter((r) => r.status === 'pending').length, note: 'Proof under administrative review', icon: FileCheck },
-    { label: 'Completed Scans', value: scanRuns.length, note: 'Historical security scans performed', icon: Activity },
+    { label: 'My Monitored Assets', value: assets.length, note: 'Targets added to your account', icon: Server, tone: 'info' },
+    { label: 'Verified Authorizations', value: authRequests.filter((r) => r.status === 'accepted').length, note: 'Private pages approved for scanning', icon: ShieldCheck, tone: 'success' },
+    { label: 'Pending Requests', value: authRequests.filter((r) => r.status === 'pending').length, note: 'Proof under administrative review', icon: FileCheck, tone: 'warning' },
+    { label: 'Completed Scans', value: scanRuns.length, note: 'Historical security scans performed', icon: Activity, tone: 'success' },
   ]
 
   return (
-    <div className="dashboard-shell">
+    <div className={`dashboard-shell ${isAdmin ? 'dashboard-shell-admin' : 'dashboard-shell-user'}`}>
       <aside className="dashboard-sidebar">
         <div className="dashboard-sidebar-label">Workspace</div>
         <div className="dashboard-role">
@@ -527,7 +527,12 @@ export default function Dashboard({ isAdmin, currentUser }) {
         <section className="dashboard-stat-grid" aria-label="Summary">
           {(isAdmin ? adminStats : userStats).map((item) => (
             <article className="dashboard-stat-card" key={item.label}>
-              <h2>{item.label}</h2>
+              <div className="dashboard-stat-heading">
+                <h2>{item.label}</h2>
+                <span className={`dashboard-stat-icon dashboard-stat-icon-${item.tone}`} aria-hidden="true">
+                  <item.icon size={18} />
+                </span>
+              </div>
               <p className="dashboard-stat-value">{isLoading ? '...' : item.value}</p>
               <p className="dashboard-stat-note">{item.note}</p>
             </article>

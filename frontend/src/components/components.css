@@ -2,7 +2,6 @@
 .login-form {
   width: 100%;
   max-width: 460px;
-  height: 500px; 
   margin: 80px auto;
   padding: 42px 40px;
   background: var(--surface);
@@ -75,6 +74,33 @@
   box-shadow: 0 0 0 3px rgba(57, 148, 230, 0.12);
 }
 
+.login-form input[aria-invalid="true"] {
+  border-color: var(--red);
+}
+
+.login-form input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(240, 82, 112, 0.12);
+}
+
+.login-error,
+.login-field-error {
+  color: var(--red);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.login-error {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(240, 82, 112, 0.1);
+  border: 1px solid rgba(240, 82, 112, 0.3);
+  border-radius: var(--radius-md);
+}
+
+.login-field-error {
+  margin: -5px 0 0;
+}
+
 .login-form button {
   min-height: 46px;
   margin-top: 20px;
@@ -82,19 +108,30 @@
   border: none;
   border-radius: var(--radius-md);
   color: white;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 650;
   cursor: pointer;
-  transition: 0.2s ease;
+  box-shadow: 0 4px 20px rgba(57, 148, 230, 0.35);
+  transition: all 0.2s ease;
 }
 
 .login-form button:hover {
   background: var(--blue-hover);
-  box-shadow: 0 4px 16px rgba(57, 148, 230, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(57, 148, 230, 0.45);
 }
 
 .login-form button:active {
   transform: translateY(1px);
+}
+
+.login-form button:disabled,
+.login-form button:disabled:hover {
+  background: var(--surface-secondary);
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: wait;
+  transform: none;
 }
 
 .register-form {
@@ -178,15 +215,17 @@
   border: none;
   border-radius: var(--radius-md);
   color: white;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 650;
   cursor: pointer;
-  transition: 0.2s ease;
+  box-shadow: 0 4px 20px rgba(57, 148, 230, 0.35);
+  transition: all 0.2s ease;
 }
 
 .register-form button:hover {
   background: var(--blue-hover);
-  box-shadow: 0 4px 16px rgba(57, 148, 230, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(57, 148, 230, 0.45);
 }
 
 .register-form button:active {
