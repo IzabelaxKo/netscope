@@ -1,17 +1,79 @@
+import { useEffect, useState } from 'react'
 import './App.css'
-import LoginForm from './components/LoginForm.jsx'
-import { useState } from 'react';
 import Cookies from 'js-cookie'
+import LoginForm from './components/LoginForm.jsx'
 import RegisterForm from './components/RegisterForm.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
+import UserDashboard from './pages/UserDashboard.jsx'
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(Cookies.get('session_token')?.trim()));
-  const [logOrReg, setLogOrReg] = useState('login'); // 'login' or 'register'
+  const [user, setUser] = useState(null)
+  const [isCheckingSession, setIsCheckingSession] = useState(
+    () => Boolean(Cookies.get('session_token')?.trim()),
+  )
+  const [authError, setAuthError] = useState('')
+  const [logOrReg, setLogOrReg] = useState('login')
+
+  useEffect(() => {
+    const token = Cookies.get('session_token')?.trim()
+    if (!token) return
+
+    let isMounted = true
+
+    const loadCurrentUser = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/auth/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response.status === 401) {
+          Cookies.remove('session_token')
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error('Unable to verify your session. Please try again.')
+        }
+
+        const data = await response.json()
+        if (!data.user || !['admin', 'user'].includes(data.user.role)) {
+          throw new Error('Your account has an unsupported role.')
+        }
+
+        if (isMounted) setUser(data.user)
+      } catch (error) {
+        if (isMounted) {
+          setAuthError(error.message || 'Unable to verify your session.')
+        }
+      } finally {
+        if (isMounted) setIsCheckingSession(false)
+      }
+    }
+
+    loadCurrentUser()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const handleLogout = () => {
-    Cookies.remove('session_token');
-    setIsLoggedIn(false);
-  };
+    Cookies.remove('session_token')
+    setUser(null)
+    setAuthError('')
+  }
+
+  const handleLoginSuccess = (loggedInUser) => {
+    if (!loggedInUser || !['admin', 'user'].includes(loggedInUser.role)) {
+      setAuthError('Your account has an unsupported role.')
+      return
+    }
+
+    setAuthError('')
+    setUser(loggedInUser)
+  }
 
   return (
     <main className="app-shell">
@@ -19,27 +81,34 @@ function App() {
         <a className="brand" href="/" aria-label="NetScope home">
           <span>NETSCOPE</span>
         </a>
-        {isLoggedIn && (
+        {user && (
           <button className="signout-button" type="button" onClick={handleLogout}>
             Sign out
           </button>
         )}
       </header>
-      {isLoggedIn ? (
-        <div className="logged-in-message">
-          <h2>Welcome to NetScope!</h2>
-          <p>You are logged in.</p>
+      {isCheckingSession ? (
+        <div className="logged-in-message" role="status">
+          <p>Checking your session...</p>
+        </div>
+      ) : authError ? (
+        <div className="logged-in-message" role="alert">
+          <p>{authError}</p>
           <button className="signout-button" type="button" onClick={handleLogout}>
-            Sign out
+            Sign out and return to login
           </button>
         </div>
+      ) : user?.role === 'admin' ? (
+        <AdminDashboard currentUser={user} />
+      ) : user?.role === 'user' ? (
+        <UserDashboard currentUser={user} />
       ) : (
         <div className="auth-container">
           {logOrReg === 'login' ? (
             <>
-              <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />
+              <LoginForm onLoginSuccess={handleLoginSuccess} />
               <p className="switch-form">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <button
                   className="switch-form-button"
                   type="button"
